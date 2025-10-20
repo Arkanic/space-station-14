@@ -10,6 +10,7 @@
     - state: generic
     - state: icon-hands
   - type: ItemBorgModule
+    dumpContainerOnIncapacitated: true
     hands:
     - hand:
         emptyRepresentative: MobResomi

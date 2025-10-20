@@ -22,6 +22,11 @@ public sealed partial class BorgSystem
         SubscribeLocalEvent<ItemBorgModuleComponent, ComponentStartup>(OnProvideItemStartup);
         SubscribeLocalEvent<ItemBorgModuleComponent, BorgModuleSelectedEvent>(OnItemModuleSelected);
         SubscribeLocalEvent<ItemBorgModuleComponent, BorgModuleUnselectedEvent>(OnItemModuleUnselected);
+
+        // STARLIGHT START
+        SubscribeLocalEvent<ItemBorgModuleComponent, BorgModuleUninstalledEvent>(OnItemModuleUninstalled);
+        SubscribeLocalEvent<ItemBorgModuleComponent, EntGotRemovedFromContainerMessage>(OnItemModuleRemoved);
+        // STARLIGHT END
     }
 
     private void OnModuleGotInserted(EntityUid uid, BorgModuleComponent component, EntGotInsertedIntoContainerMessage args)
@@ -178,6 +183,38 @@ public sealed partial class BorgSystem
     {
         RemoveProvidedItems(args.Chassis, uid, component: component);
     }
+
+    // STARLIGHT START
+    private void OnItemModuleUninstalled(EntityUid uid, ItemBorgModuleComponent component, ref BorgModuleUninstalledEvent args)
+    {
+        if (component.DumpContainerOnIncapacitated)
+            DumpModuleContainer(uid, component);
+    }
+
+    private void OnItemModuleRemoved(EntityUid uid, ItemBorgModuleComponent component, EntGotRemovedFromContainerMessage args)
+    {
+        var chassis = args.Container.Owner;
+
+        if (!TryComp<BorgChassisComponent>(chassis, out var chassisComp) ||
+            args.Container != chassisComp.ModuleContainer)
+            return;
+
+        if (component.DumpContainerOnIncapacitated)
+            DumpModuleContainer(uid, component);
+    }
+    
+    private void DumpModuleContainer(EntityUid module, ItemBorgModuleComponent comp)
+    {
+        if (!_container.TryGetContainer(module, comp.HoldingContainer, out var container)) return;
+        if (comp.StoredItems == null) return;
+
+        foreach (var (key, value) in comp.StoredItems)
+        {
+            _container.TryRemoveFromContainer(value, false);
+        }
+        comp.StoredItems?.Clear();
+    }
+    // STARLIGHT END
 
     private void ProvideItems(EntityUid chassis, EntityUid uid, BorgChassisComponent? chassisComponent = null, ItemBorgModuleComponent? component = null)
     {

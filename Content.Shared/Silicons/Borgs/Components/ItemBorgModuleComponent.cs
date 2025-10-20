@@ -29,6 +29,15 @@ public sealed partial class ItemBorgModuleComponent : Component
     /// </summary>
     [DataField]
     public string HoldingContainer = "holding_container";
+
+    // STARLIGHT START
+    /// <summary>
+    /// Should the container force drop it's contents on module remove, or borg death?
+    /// Used for the "personnel transport module"
+    /// </summary>
+    [DataField]
+    public bool DumpContainerOnIncapacitated = false;
+    // STARLIGHT END
 }
 
 [DataDefinition, Serializable, NetSerializable]
