@@ -1,0 +1,82 @@
+- type: entity
+  name: paramedic medipen
+  parent: BaseItem
+  description: A sterile injector for rapid administration of drugs to patients. This one is specialised for use by paramedics and can be reloaded.
+  id: ParaMedipen
+  components:
+  - type: Sprite
+    sprite: _Starlight/Objects/Specific/Medical/paramedipen.rsi
+    layers:
+    - state: pen
+    - state: cartridge
+    - state: fill2
+      map: ["enum.SolutionContainerLayers.Fill"]
+  - type: Item
+    sprite: Objects/Specific/Medical/medipen.rsi
+    inhandVisuals:
+      left:
+      - state: base-needle-inhand-left
+      - state: base-colorA-inhand-left
+        color: "#175163"
+      - state: base-colorB-inhand-left
+      right:
+      - state: base-needle-inhand-right
+      - state: base-colorA-inhand-right
+        color: "#175163"
+      - state: base-colorB-inhand-right
+    size: Tiny
+  - type: Hypospray
+    solutionName: cartridge
+    transferAmount: 15
+    onlyAffectsMobs: false
+    injectOnly: true
+  - type: Appearance
+  - type: SolutionContainerVisuals
+    maxFillLevels: 1
+    changeColor: false
+    emptySpriteName: pen_cartridge
+  - type: StaticPrice
+    price: 150
+  - type: ItemSlots
+    slots: 
+      cartridge_slot:
+        name: cartridge-slot-name-default
+        startingItem: ECartridge
+        whitelist:
+          tags:
+          - PenCartridge
+
+- type: entity
+  name: emergency cartridge
+  parent: BaseItem
+  description: A disposble cartridge designed to fit in a paramedic's emergency pen. Has enough chemicals for two uses.
+  id: ECartridge
+  components:
+  - type: Sprite
+    sprite: _Starlight/Objects/Specific/Medical/paramedipen.rsi
+    layers:
+    - state: cartridge_icon
+    - state: fill2
+      map: ["enum.SolutionContainerLayers.Fill"]
+  - type: Item
+    size: Tiny
+  - type: SolutionContainerManager
+    solutions:
+      cartridge:
+        maxVol: 30
+        reagents:
+        - ReagentId: Epinephrine
+          Quantity: 24
+        - ReagentId: TranexamicAcid
+          Quantity: 6
+  - type: ExaminableSolution
+    solution: cartridge
+    exactVolume: true
+  - type: SolutionContainerVisuals
+    maxFillLevels: 2
+    fillBaseName: fill
+    changeColor: false
+    emptySpriteName: cartridge_icon
+  - type: Tag
+    tags: 
+    - PenCartridge

@@ -158,7 +158,10 @@
 
 - type: Tag
   id: PatchPack
-  
+
+- type: Tag
+  id: PenCartridge
+
 - type: Tag
   id: PlasteelFilament
 
