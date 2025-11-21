@@ -50,4 +50,13 @@ public sealed partial class HyposprayComponent : Component
     /// </summary>
     [DataField]
     public bool InjectOnly = false;
+
+    // starlight start
+
+    /// <summary>
+    /// If not null, tries to draw solution from container in slot instead
+    /// </summary>
+    [DataField]
+    public string? SolutionContainerName = null;
+    // starlight end
 }

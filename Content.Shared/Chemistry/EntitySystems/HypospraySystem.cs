@@ -16,6 +16,7 @@ using Content.Shared.Timing;
 using Content.Shared.Verbs;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Audio.Systems;
+using Content.Shared.Containers.ItemSlots;
 
 namespace Content.Shared.Chemistry.EntitySystems;
 
@@ -27,6 +28,7 @@ public sealed class HypospraySystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainers = default!;
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!; // starlight
 
     public override void Initialize()
     {
@@ -132,7 +134,17 @@ public sealed class HypospraySystem : EntitySystem
         else if (target == user)
             msgFormat = "hypospray-component-inject-self-message";
 
-        if (!_solutionContainers.TryGetSolution(uid, component.SolutionName, out var hypoSpraySoln, out var hypoSpraySolution) || hypoSpraySolution.Volume == 0)
+        // starlight start
+        var containerUid = uid;
+        if (component.SolutionContainerName != null)
+        {
+            var container = _itemSlots.GetItemOrNull(uid, component.SolutionContainerName);
+            if (container != null) containerUid = (EntityUid)container;
+            else return true;
+        }
+        // starlight end
+
+        if (!_solutionContainers.TryGetSolution(containerUid, component.SolutionName, out var hypoSpraySoln, out var hypoSpraySolution) || hypoSpraySolution.Volume == 0) // starlight
         {
             _popup.PopupClient(Loc.GetString("hypospray-component-empty-message"), target, user);
             return true;
@@ -188,7 +200,17 @@ public sealed class HypospraySystem : EntitySystem
 
     private bool TryDraw(Entity<HyposprayComponent> entity, EntityUid target, Entity<SolutionComponent> targetSolution, EntityUid user)
     {
-        if (!_solutionContainers.TryGetSolution(entity.Owner, entity.Comp.SolutionName, out var soln,
+        // starlight start
+        var containerUid = entity.Owner;
+        if (entity.Comp.SolutionContainerName != null)
+        {
+            var container = _itemSlots.GetItemOrNull(entity.Owner, entity.Comp.SolutionContainerName);
+            if (container != null) containerUid = (EntityUid)container;
+            else return false;
+        }
+        // starlight end
+
+        if (!_solutionContainers.TryGetSolution(containerUid, entity.Comp.SolutionName, out var soln, // starlight
                 out var solution) || solution.AvailableVolume == 0)
         {
             return false;
